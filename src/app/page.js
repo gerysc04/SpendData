@@ -10,6 +10,7 @@ import Filters from '@/components/Filters'
 import ExpenseTable from '@/components/ExpenseTable'
 import ExpenseForm from '@/components/ExpenseForm'
 import EntityForm from '@/components/EntityForm'
+import CSVImport from '@/components/CSVImport'
 
 export default function Home() {
   const [expenses, setExpenses] = useState([])
@@ -20,6 +21,7 @@ export default function Home() {
   const [showExpenseForm, setShowExpenseForm] = useState(false)
   const [showUserForm, setShowUserForm] = useState(false)
   const [showCategoryForm, setShowCategoryForm] = useState(false)
+  const [showCSVImport, setShowCSVImport] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
   const [loading, setLoading] = useState(true)
   const expenseFormRef = useRef(null)
@@ -105,10 +107,12 @@ export default function Home() {
         }}
         onAddUser={() => setShowUserForm(!showUserForm)}
         onAddCategory={() => setShowCategoryForm(!showCategoryForm)}
+        onImportCSV={() => setShowCSVImport(!showCSVImport)}
       />
 
       {showUserForm && <EntityForm title="New User" onSubmit={handleAddUser} />}
       {showCategoryForm && <EntityForm title="New Category" onSubmit={handleAddCategory} />}
+      {showCSVImport && <CSVImport onImport={() => { setShowCSVImport(false); fetchAll() }} />}
       <div ref={expenseFormRef}>
         {showExpenseForm && (
           <ExpenseForm

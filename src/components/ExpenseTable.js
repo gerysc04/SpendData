@@ -1,10 +1,20 @@
 import ExpenseRow from './ExpenseRow'
+import { exportToCSV } from '@/lib/csvHelpers'
 import styles from '@/styles/ExpenseTable.module.css'
 
-export default function ExpensesTable({ expenses, onDelete, onEdit }) {
+export default function ExpenseTable({ expenses, onDelete, onEdit }) {
   return (
     <div className={styles.card}>
-      <h2 className={styles.title}>Expenses</h2>
+      <div className={styles.header}>
+        <h2 className={styles.title}>Expenses</h2>
+        <button
+          className={styles.exportBtn}
+          onClick={() => exportToCSV(expenses)}
+          disabled={expenses.length === 0}
+        >
+          Export CSV
+        </button>
+      </div>
       {expenses.length === 0 ? (
         <p className={styles.empty}>No expenses found.</p>
       ) : (
