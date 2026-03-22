@@ -1,5 +1,5 @@
 import ExpenseRow from './ExpenseRow'
-import styles from '@/styles/ExpensesTable.module.css'
+import styles from '@/styles/ExpenseTable.module.css'
 
 export default function ExpensesTable({ expenses, onDelete, onEdit }) {
   return (

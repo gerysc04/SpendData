@@ -1,4 +1,4 @@
-import styles from '@/styles/ExpensesTable.module.css'
+import styles from '@/styles/ExpenseTable.module.css'
 
 export default function ExpenseRow({ expense, onDelete, onEdit }) {
   return (
