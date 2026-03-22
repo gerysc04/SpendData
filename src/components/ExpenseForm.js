@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from '@/styles/ExpenseForm.module.css'
 
-export default function ExpenseForm({ users, categories, onSubmit }) {
+export default function ExpenseForm({ users, categories, onSubmit, expense }) {
   const [form, setForm] = useState({
     description: '',
     amount: '',
@@ -11,6 +11,18 @@ export default function ExpenseForm({ users, categories, onSubmit }) {
     userId: '',
     categoryId: ''
   })
+
+  useEffect(() => {
+    if (expense) {
+      setForm({
+        description: expense.description,
+        amount: expense.amount,
+        date: new Date(expense.date).toISOString().split('T')[0],
+        userId: expense.userId?._id || '',
+        categoryId: expense.categoryId?._id || ''
+      })
+    }
+  }, [expense])
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -24,7 +36,7 @@ export default function ExpenseForm({ users, categories, onSubmit }) {
 
   return (
     <div className={styles.card}>
-      <h3 className={styles.title}>New Expense</h3>
+      <h3 className={styles.title}>{expense ? 'Edit Expense' : 'New Expense'}</h3>
       <form onSubmit={handleSubmit} className={styles.form}>
         <input
           required
@@ -75,7 +87,9 @@ export default function ExpenseForm({ users, categories, onSubmit }) {
             <option key={c._id} value={c._id}>{c.name}</option>
           ))}
         </select>
-        <button type="submit" className={styles.btn}>Add Expense</button>
+        <button type="submit" className={styles.btn}>
+          {expense ? 'Save Changes' : 'Add Expense'}
+        </button>
       </form>
     </div>
   )

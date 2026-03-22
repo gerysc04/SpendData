@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { fetchExpenses, fetchUsers, fetchCategories, createExpense, createUser, createCategory } from '@/lib/api'
+import { useState, useEffect, useRef } from 'react'
+import { fetchExpenses, fetchUsers, fetchCategories, createExpense, createUser, createCategory, deleteExpense, updateExpense } from '@/lib/api'
 import Header from '@/components/Header'
 import StatsCards from '@/components/StatsCards'
 import ExpenseChart from '@/components/ExpenseChart'
 import CategoryChart from '@/components/CategoryChart'
 import Filters from '@/components/Filters'
-import ExpensesTable from '@/components/ExpenseTable'
+import ExpenseTable from '@/components/ExpenseTable'
 import ExpenseForm from '@/components/ExpenseForm'
 import EntityForm from '@/components/EntityForm'
 
@@ -20,7 +20,9 @@ export default function Home() {
   const [showExpenseForm, setShowExpenseForm] = useState(false)
   const [showUserForm, setShowUserForm] = useState(false)
   const [showCategoryForm, setShowCategoryForm] = useState(false)
+  const [editingExpense, setEditingExpense] = useState(null)
   const [loading, setLoading] = useState(true)
+  const expenseFormRef = useRef(null)
 
   useEffect(() => {
     fetchAll()
@@ -43,6 +45,29 @@ export default function Home() {
     await createExpense(data)
     setShowExpenseForm(false)
     fetchAll()
+  }
+
+  async function handleUpdateExpense(data) {
+    await updateExpense(editingExpense._id, data)
+    setEditingExpense(null)
+    setShowExpenseForm(false)
+    fetchAll()
+  }
+
+  async function handleDelete(id) {
+    await deleteExpense(id)
+    fetchAll()
+  }
+
+  async function handleEdit(expense) {
+    setShowExpenseForm(false)
+    setEditingExpense(expense)
+    setTimeout(() => {
+      setShowExpenseForm(true)
+      setTimeout(() => {
+        expenseFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 50)
+    }, 0)
   }
 
   async function handleAddUser(data) {
@@ -74,14 +99,27 @@ export default function Home() {
   return (
     <main style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2rem' }}>
       <Header
-        onAddExpense={() => setShowExpenseForm(!showExpenseForm)}
+        onAddExpense={() => {
+          setEditingExpense(null)
+          setShowExpenseForm(!showExpenseForm)
+        }}
         onAddUser={() => setShowUserForm(!showUserForm)}
         onAddCategory={() => setShowCategoryForm(!showCategoryForm)}
       />
 
       {showUserForm && <EntityForm title="New User" onSubmit={handleAddUser} />}
       {showCategoryForm && <EntityForm title="New Category" onSubmit={handleAddCategory} />}
-      {showExpenseForm && <ExpenseForm users={users} categories={categories} onSubmit={handleAddExpense} />}
+      <div ref={expenseFormRef}>
+        {showExpenseForm && (
+          <ExpenseForm
+            key={editingExpense?._id || 'new'}
+            users={users}
+            categories={categories}
+            onSubmit={editingExpense ? handleUpdateExpense : handleAddExpense}
+            expense={editingExpense}
+          />
+        )}
+      </div>
 
       <StatsCards expenses={filtered} />
 
@@ -96,7 +134,11 @@ export default function Home() {
 
       <ExpenseChart expenses={filtered} />
       <CategoryChart expenses={filtered} />
-      <ExpensesTable expenses={filtered} onDelete={() => {}} onEdit={() => {}} />
+      <ExpenseTable
+        expenses={filtered}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+      />
     </main>
   )
 }
