@@ -1,5 +1,7 @@
 import connectDB from '@/lib/mongodb'
 import Expense from '@/models/Expense'
+import '@/models/User'
+import '@/models/Category'
 import { NextResponse } from 'next/server'
 
 export async function PATCH(request, { params }) {
