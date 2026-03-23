@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import toast from 'react-hot-toast'
 import { fetchExpenses, fetchUsers, fetchCategories, createExpense, createUser, createCategory, deleteExpense, updateExpense } from '@/lib/api'
 import Header from '@/components/Header'
 import StatsCards from '@/components/StatsCards'
@@ -44,21 +45,36 @@ export default function Home() {
   }
 
   async function handleAddExpense(data) {
-    await createExpense(data)
-    setShowExpenseForm(false)
-    fetchAll()
+    try {
+      await createExpense(data)
+      setShowExpenseForm(false)
+      fetchAll()
+      toast.success('Expense added successfully')
+    } catch {
+      toast.error('Failed to add expense')
+    }
   }
 
   async function handleUpdateExpense(data) {
-    await updateExpense(editingExpense._id, data)
-    setEditingExpense(null)
-    setShowExpenseForm(false)
-    fetchAll()
+    try {
+      await updateExpense(editingExpense._id, data)
+      setEditingExpense(null)
+      setShowExpenseForm(false)
+      fetchAll()
+      toast.success('Expense updated successfully')
+    } catch {
+      toast.error('Failed to update expense')
+    }
   }
 
   async function handleDelete(id) {
-    await deleteExpense(id)
-    fetchAll()
+    try {
+      await deleteExpense(id)
+      fetchAll()
+      toast.success('Expense deleted')
+    } catch {
+      toast.error('Failed to delete expense')
+    }
   }
 
   async function handleEdit(expense) {
@@ -73,15 +89,25 @@ export default function Home() {
   }
 
   async function handleAddUser(data) {
-    await createUser(data)
-    setShowUserForm(false)
-    fetchAll()
+    try {
+      await createUser(data)
+      setShowUserForm(false)
+      fetchAll()
+      toast.success(`User "${data.name}" created`)
+    } catch {
+      toast.error('Failed to create user')
+    }
   }
 
   async function handleAddCategory(data) {
-    await createCategory(data)
-    setShowCategoryForm(false)
-    fetchAll()
+    try {
+      await createCategory(data)
+      setShowCategoryForm(false)
+      fetchAll()
+      toast.success(`Category "${data.name}" created`)
+    } catch {
+      toast.error('Failed to create category')
+    }
   }
 
   const filtered = expenses.filter(exp => {
@@ -112,7 +138,7 @@ export default function Home() {
 
       {showUserForm && <EntityForm title="New User" onSubmit={handleAddUser} />}
       {showCategoryForm && <EntityForm title="New Category" onSubmit={handleAddCategory} />}
-      {showCSVImport && <CSVImport onImport={() => { setShowCSVImport(false); fetchAll() }} />}
+      {showCSVImport && <CSVImport onImport={() => { setShowCSVImport(false); fetchAll(); toast.success('CSV imported successfully') }} />}
       <div ref={expenseFormRef}>
         {showExpenseForm && (
           <ExpenseForm
