@@ -4,7 +4,7 @@ Enterprise expense tracking and visualization platform built as a technical chal
 
 ## Live Demo
 
-[https://spend-data-gerysc04s-projects.vercel.app/](https://spend-data-gerysc04s-projects.vercel.app/)
+[https://spend-data.vercel.app/](https://spend-data.vercel.app/)
 
 ## Overview
 
