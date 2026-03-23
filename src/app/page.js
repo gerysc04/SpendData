@@ -19,6 +19,8 @@ export default function Home() {
   const [categories, setCategories] = useState([])
   const [selectedUser, setSelectedUser] = useState('all')
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
   const [showExpenseForm, setShowExpenseForm] = useState(false)
   const [showUserForm, setShowUserForm] = useState(false)
   const [showCategoryForm, setShowCategoryForm] = useState(false)
@@ -113,7 +115,10 @@ export default function Home() {
   const filtered = expenses.filter(exp => {
     const matchUser = selectedUser === 'all' || exp.userId?._id === selectedUser
     const matchCat = selectedCategory === 'all' || exp.categoryId?._id === selectedCategory
-    return matchUser && matchCat
+    const expDate = new Date(exp.date)
+    const matchFrom = !dateFrom || expDate >= new Date(dateFrom)
+    const matchTo = !dateTo || expDate <= new Date(dateTo)
+    return matchUser && matchCat && matchFrom && matchTo
   })
 
   if (loading) {
@@ -160,6 +165,10 @@ export default function Home() {
         selectedCategory={selectedCategory}
         onUserChange={setSelectedUser}
         onCategoryChange={setSelectedCategory}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onDateFromChange={setDateFrom}
+        onDateToChange={setDateTo}
       />
 
       <ExpenseChart expenses={filtered} />
