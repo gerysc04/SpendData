@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SpendData
 
-## Getting Started
+Enterprise expense tracking and visualization platform built as a technical challenge.
 
-First, run the development server:
+## Live Demo
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+[https://spend-data-gerysc04s-projects.vercel.app/](https://spend-data-gerysc04s-projects.vercel.app/)
+
+## Overview
+
+SpendData allows companies to track, visualize and analyze employee expenses over time. Expenses are assigned to users and categories, and displayed through interactive charts and a filterable data table.
+
+The core concept maps directly to a metrics platform: each expense is a metric with a **value** (amount), a **name** (description), and a **timestamp** (date) — enriched with relational context (user, category) to make the data actionable.
+
+## Tech Stack
+
+- **Frontend**: Next.js 15 (App Router), React, Tailwind CSS, CSS Modules
+- **Backend**: Next.js API Routes
+- **Database**: MongoDB Atlas via Mongoose
+- **Charts**: Recharts
+- **Notifications**: react-hot-toast
+- **CSV Parsing**: PapaParse
+
+## Architecture Decisions
+
+### Next.js as a full-stack framework
+Rather than maintaining a separate frontend and backend, Next.js API routes serve as the backend layer. This simplifies the deployment (single Vercel project), keeps the codebase in one repository, and follows a BFF-inspired pattern where the API is purpose-built for this specific frontend.
+
+### MongoDB over SQL
+Expense data is naturally document-shaped and schema flexibility is valuable — adding fields like tags, attachments or metadata in the future requires no migrations. MongoDB Atlas also provides a generous free tier ideal for this use case.
+
+### CSS Modules over a component library
+CSS Modules were chosen over Tailwind utility classes or a UI library to keep styles explicit, colocated, and easy to reason about during a code review. Each component owns its styles with no global side effects.
+
+### Client-side filtering and sorting
+All filtering (by user, category, date range) and sorting happens on the client since the full dataset is fetched on load. For large datasets this would move to the backend with query parameters — the API is already shaped to support this.
+
+## Features
+
+- Post expenses with description, amount, date, user and category
+- Line chart showing spending over time — toggle between total, per category, and per user views
+- Pie chart showing spending breakdown by category
+- Filter expenses by user, category and date range
+- Sort expenses by any column
+- Edit and delete expenses with confirmation
+- Export filtered expenses to CSV
+- Import expenses from CSV — users and categories are created automatically if they don't exist (upsert pattern)
+- Toast notifications for all actions
+
+## Data Model
+```
+User        { name, color }
+Category    { name, color }
+Expense     { description, amount, date, userId, categoryId }
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## CSV Import Format
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Columns must be in this order (header row optional):
+```
+description, amount, date, user, category
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Example:
+```
+Team lunch, 45.50, 2026-01-05, Gerard, Food
+Office supplies, 120.00, 2026-01-08, Sarah, Office
+```
 
-## Learn More
+## Running Locally
+```bash
+# Clone the repo
+git clone https://github.com/gerysc04/SpendData.git
+cd SpendData
 
-To learn more about Next.js, take a look at the following resources:
+# Install dependencies
+npm install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Set up environment variables
+cp .env.example .env.local
+# Add your MongoDB URI to .env.local
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Run the development server
+npm run dev
+```
 
-## Deploy on Vercel
+Open [http://localhost:3000](http://localhost:3000)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Environment Variables
+```
+MONGODB_URI=your_mongodb_atlas_connection_string
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Potential Improvements
+
+- **Authentication**: Add NextAuth.js with OAuth — the data model already supports it since expenses are linked to a userId
+- **Pagination**: For large datasets, paginate the expenses table and move filtering to the backend
+- **CSV Import queue**: For large CSV files, process imports asynchronously using a job queue (e.g. Bull) to avoid blocking the request
+- **Budget limits**: Set spending limits per category and alert when exceeded
+- **Real-time updates**: Use Server-Sent Events or WebSockets to push new expenses to all connected clients
+
