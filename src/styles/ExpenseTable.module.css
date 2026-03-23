@@ -146,3 +146,12 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortable:hover {
+  color: var(--accent);
+}
