@@ -13,4 +13,4 @@ export async function POST(request) {
   const body = await request.json()
   const user = await User.create(body)
   return NextResponse.json(user, { status: 201 })
-}asdasdasd
+}
